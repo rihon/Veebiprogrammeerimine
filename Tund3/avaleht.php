@@ -4,6 +4,9 @@
 	$myFamilyName= "Noormets";
 	$monthNameEt =["jaanuar", "veebruar", "märts", "aprill", "mai", "juuni", "juuli", "august", "september", "oktoober", "november", "detsember"];
 	$myAge= 0;
+	$myBirthYear;
+	$myLivedYearsList= "";
+	
 	//var_dump $monthNameEt;
 	echo $monthNameEt[8];
 	
@@ -22,11 +25,18 @@
 	//Nüüd vaatame, kas ja mida kasutaja sisestas
 	//var_dump($_POST);
 	if (isset($_POST["yearBirth"])){
-		$myAge= date("Y") - $_POST["yearBirth"];
+		$myBirthYear = $_POST["yearBirth"];
+		$myAge= date("Y") - $myBirthYear;
+		
+		//Tekitame loendi kõigist elatud aastatest
+		$myLivedYearsList .="<ol> \n";
+		for ($i= $myBirthYear; $i<= date("Y"); $i++){
+			//echo $i;
+			$myLivedYearsList .="<li>" .$i ."</li> \n";
+		}
+		$myLivedYearsList .="</ol> \n";
 	}
-	
-	
-	
+		
 ?>
 
 <!DOCTYPE html>
@@ -61,9 +71,15 @@
 	<p>Järgnevalt palume sisestada oma sünniaasta</p>
 	<form method="POST">
 		<label>Teie sünniaasta</label>
-		<input id="yearBirth" name="yearBirth" type="number" min="1900" max="2017" value="1998">
+		<input id="yearBirth" name="yearBirth" type="number" min="1900" max="2017" value="<?php echo $myBirthYear;?>">
 		<input id="submitYearBirth" name="submitYearBirth" type="submit" value="Kinnita">
 	</form>
 	<p>Teie vanus on <?php echo $myAge; ?> aastat </p>
+	<?php
+		if ($myLivedYearsList !=""){
+				echo"<h3>Oled elanud järgnevatel aastatel</h3> \n";
+				echo $myLivedYearsList;
+		}
+	?>
 </body>
 </html>
