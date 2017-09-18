@@ -2,6 +2,6 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Test test testsfsaddgaöjsdgjkafägafgae</title>
+    <title>Test test test</title>
   </head>
 </html>
