@@ -1,8 +1,8 @@
 <?php
 	$dirToRead ="../../Pictures/";
 	// kuna tahan ainult pildi faile, siis filtreerin
-	$picFileTypes = ["jpg", "jpeg", "png", "gif"]
-	$picFiles =[];
+	$picFileTypes = ["jpg", "jpeg", "png", "gif"];
+	$picFiles = [];
 	//$allFiles =scandir($dirToRead);
 	//loen kataloogi ja viskan kaks esimest massiivi liiget (. ja ..) välja
 	$allFiles = array_slice(scandir($dirToRead),2);
@@ -19,7 +19,7 @@
 			
 		}
 	}
-		//mitu pilit on$
+		//mitu pilti on
 		$fileCount= count($picFiles);
 		$picNumber= mt_rand(0, $fileCount - 1);
 		$picToShow= $picFiles[$picNumber];
