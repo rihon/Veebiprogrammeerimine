@@ -1,6 +1,16 @@
 <?php
 	require("../../config.php");
+	require("functions.php");
 	//echo $serverHost;
+	
+	//Kui on sisseloginud, siis kohe main.php lehele
+	if(isset($_SESSION["userId"])){
+		header("Location: main.php");
+		exit();
+	}
+	
+	
+	
 	$signupFirstName = "";
 	$signupFamilyName = "";
 	$gender = "";
@@ -19,18 +29,25 @@
 	$signupGenderError = "";
 	$signupEmailError = "";
 	$signupPasswordError = "";
-	
-	//kas on kasutajanimi sisestatud
-	if (isset ($_POST["loginEmail"])){
-		if (empty ($_POST["loginEmail"])){
-			$loginEmailError ="NB! Ilma selleta ei saa sisse logida!";
-		} else {
-			$loginEmail = $_POST["loginEmail"];
+	$notice = "";
+	//Kas logitakse sisse
+	if(isset($_POST["loginButton"])){
+		//kas on kasutajanimi sisestatud
+		if (isset ($_POST["loginEmail"])){
+			if (empty ($_POST["loginEmail"])){
+				$loginEmailError ="NB! Ilma selleta ei saa sisse logida!";
+			} else {
+				$loginEmail = $_POST["loginEmail"];
+			}
 		}
-	}
-	
-	//KÕiki kasutaja loomise sisestusi kontrollitakse vaid, kui on vastavat nuppu klikitud
-	if(isset($_POST["signUpButton"]) and $_POST["signUpButton"] == "Loo kasutaja"){
+		if(!empty($loginEmail) and !empty($_POST["loginPassword"])){
+			//echo "Login sisse!";
+			//Kutsun logimise funktsiooni
+			$notice = signIn($loginEmail, $_POST["loginPassword"]);
+		}
+	}//if loginButton
+	//Kõiki kasutaja loomise sisestusi kontrollitakse vaid, kui on vastavat nuppu klikitud
+	if(isset($_POST["signUpButton"])){
 	
 		//kontrollime, kas kirjutati eesnimi
 		if (isset ($_POST["signupFirstName"])){
@@ -95,6 +112,7 @@
 			}
 		}
 		
+		//Salasõna loomine
 		if (isset ($_POST["signupPassword"])){
 			if (empty ($_POST["signupPassword"])){
 				$signupPasswordError = "NB! Väli on kohustuslik!";
@@ -118,24 +136,10 @@
 			//krüpteerin parooli
 			$signupPassword = hash("sha512", $_POST["signupPassword"]);
 			//echo "\n Parooli " .$_POST["signupPassword"] ." räsi on: " .$signupPassword;
-			//loome andmebaasiühenduse
-			$database = "if17_riho_4";
-			$mysqli = new mysqli($serverHost, $serverUsername, $serverPassword, $database);
-			//valmistame ette käsu andmebaasiserverile
-			$stmt = $mysqli->prepare("INSERT INTO vp_users (firstname, lastname, birthday, gender, email, password) VALUES (?, ?, ?, ?, ?, ?)");
-			echo $mysqli->error;
-			//s - string
-			//i - integer
-			//d - decimal
-			$stmt->bind_param("sssiss", $signupFirstName, $signupFamilyName, $signupBirthDate, $gender, $signupEmail, $signupPassword);
-			//$stmt->execute();
-			if ($stmt->execute()){
-				echo "\n Õnnestus!";
-			} else {
-				echo "\n Tekkis viga : " .$stmt->error;
-			}
-			$stmt->close();
-			$mysqli->close();
+			
+			//kutsume välja kasutaja salvestamise funktsiooni 
+			signUp($signupFirstName, $signupFamilyName, $signupBirthDate, $gender, $signupEmail, $signupPassword);			
+			
 		}
 	}
 	
@@ -183,14 +187,7 @@
 	}
 	$signupYearSelectHTML.= "</select> \n";
 	
-	//sisestuse kontrollimise funktsioon
-	function test_input($data){//sulgudesse kirjutatakse argumente
-		//Kontroll kas emailil pole tühikuid, kaldkriipsud
-		$data = trim($data);//Ebavajalikud tühikud jms eemaldatud
-		$data = stripslashes($data); //Kaldkriipsud eemaldada
-		$data = htmlspecialchars($data);//Keelatud sümbolid ($)
-		return $data;
-	}	
+		
 	
 ?>
 <!DOCTYPE html>
@@ -209,7 +206,7 @@
 		<br><br>
 		<input name="loginPassword" placeholder="Salasõna" type="password">
 		<br><br>
-		<input type="submit" value="Logi sisse">
+		<input name="loginButton" type="submit" value="Logi sisse"><span><?php echo $notice; ?></span>
 	</form>
 	
 	<h1>Loo kasutaja</h1>
